@@ -1,0 +1,11 @@
+[profile.default]
+auto_detect_solc = false
+solc = "0.8.20"
+gas_reports = ["*"]
+optimizer = true
+optimizer_runs = 1_000_000
+src = "src"
+out = "out"
+libs = ["lib"]
+
+# I like this template a lot: https://github.com/PaulRBerg/foundry-template/blob/main/foundry.toml
