@@ -97,7 +97,7 @@ contract CommitmentStore is ICommitmentStore {
      * @dev Deletes any active withdrawal requests for staker.
      * @param slashAmount Amount of stake to slash, which should be determined by the staker's commitment and
      * level of violation.
-     * @param slashRecipient Recipient who would receive a successful bonk. Also should  be determined by staker's
+     * @param slashRecipient Recipient who would receive a successful bonk. Also should be determined by staker's
      * commitment terms.
      * @param details Additional data provided by slasher to describe slash. We might not use this parameter at all
      * but wanted to provide it for demonstration purposes. For example, might be a link to some IPFS hash
