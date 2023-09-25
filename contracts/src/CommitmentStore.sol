@@ -18,7 +18,6 @@ contract CommitmentStore is ICommitmentStore {
     mapping(address => Commitment) public commitments;
     mapping(address => Withdrawal) public withdrawals;
     mapping(address => Slash) public bonks;
-
     struct Commitment {
         // Slashable amount of tokens for this commitment. Can be
         // added to after initial stake.
