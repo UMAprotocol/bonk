@@ -16,8 +16,17 @@ contract ICommitmentStore {
     error NonZeroStake();
     error SlashDoesNotExist();
 
-    event NewCommitment(bytes32 indexed stakerId, address indexed staker, uint256 stakeAmount, bytes32 indexed commitmentTerms);
-    event BonkAttempt(bytes32 indexed stakerId, address indexed staker, address indexed bonker, uint256 slashAmount, address slashRecipient, bytes32 details);
+    event NewCommitment(
+        bytes32 indexed stakerId, address indexed staker, uint256 stakeAmount, bytes32 indexed commitmentTerms
+    );
+    event BonkAttempt(
+        bytes32 indexed stakerId,
+        address indexed staker,
+        address indexed bonker,
+        uint256 slashAmount,
+        address slashRecipient,
+        bytes32 details
+    );
     event BonkDenied(bytes32 indexed stakerId, address indexed staker, address indexed bonker, address denier);
     event BonkSucceeded(bytes32 indexed stakerId, address indexed staker, address indexed bonker);
     event RequestCommitmentWithdrawal(bytes32 indexed stakerId, address indexed staker, uint256 finalizationTimestamp);
@@ -39,7 +48,7 @@ contract ICommitmentStore {
         bytes32 commitmentTermsIdentifier;
     }
 
-    // A withdrawal attempt represents a request by the staker in a commitment to withdraw their tokens following 
+    // A withdrawal attempt represents a request by the staker in a commitment to withdraw their tokens following
     // a challenge period.
     struct Withdrawal {
         // Time when withdrawal request can be finalized.
@@ -59,5 +68,4 @@ contract ICommitmentStore {
         // Time when slash attempt can be finalized.
         uint256 finalizationTimestamp;
     }
-
 }
