@@ -7,8 +7,9 @@ on: [push]
 
 jobs:
   lint:
-    defaults.run:
-      working-directory: "./contracts"
+    defaults:
+      run:
+        working-directory: "./contracts"
     runs-on: "ubuntu-latest"
     steps:
       - name: "Check out the repo"
@@ -29,8 +30,9 @@ jobs:
 
   build:
     runs-on: "ubuntu-latest"
-    defaults.run:
-      working-directory: "./contracts"
+    defaults:
+      run:
+        working-directory: "./contracts"
     steps:
       - name: "Check out the repo"
         uses: "actions/checkout@v3"
@@ -50,8 +52,9 @@ jobs:
 
   test:
     needs: ["lint", "build"]
-    defaults.run:
-      working-directory: "./contracts"
+    defaults:
+      run:
+        working-directory: "./contracts"
     runs-on: "ubuntu-latest"
     steps:
       - name: "Check out the repo"
