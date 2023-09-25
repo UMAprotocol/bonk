@@ -6,6 +6,9 @@ import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 
 // Features we would add in the future:
+// - Ability for staker to earn revenue in exchange for staking. This could be used for example by MEV relays
+//   who are willing to enter into an SLA promising to offer premier services (i.e. X% of slot share or always in 
+//   top 3 of relays etc.) in exchange for charging builders/validators a fee.
 // - Ability for there to be multiple stakers (i.e. mapping(address=>uint256) stakers)
 //   for each commitment. Would increase complexity for slashing logic such that all stakers
 //   are slashed equally.
