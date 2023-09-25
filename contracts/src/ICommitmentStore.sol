@@ -39,8 +39,7 @@ contract ICommitmentStore {
         address staker;
         // Token to stake.
         IERC20 stakeToken;
-        // Slashable amount of tokens for this commitment. Can be
-        // added to after initial stake.
+        // Slashable amount of tokens for this commitment. Can be added to after initial stake.
         uint256 stakeAmount;
         // Identifier pointing to terms of commitment, which functions as a SLA (Service Layer Agreement) economically
         // binding the staker to the terms of the commitment otherwise their stake amount can be slashed.
