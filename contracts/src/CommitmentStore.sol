@@ -18,9 +18,9 @@ contract CommitmentStore is ICommitmentStore {
     mapping(address => Commitment) public commitments;
     mapping(address => Withdrawal) public withdrawals;
     mapping(address => Slash) public bonks;
-    
+
     struct Commitment {
-        // Slashable amount of tokens for this commitment. Can be 
+        // Slashable amount of tokens for this commitment. Can be
         // added to after initial stake.
         uint256 stakeAmount;
         // URL to readable terms of commitment detailing slashing conditions.
@@ -45,9 +45,7 @@ contract CommitmentStore is ICommitmentStore {
 
     /// CREATE NEW COMMITMENT AND DEPOSIT STAKE
 
-    function makeCommitment(
-        Commitment memory commitment
-    ) external payable {
+    function makeCommitment(Commitment memory commitment) external payable {
         if (commitment.stakeAmount == 0) revert ZeroStake();
         // Should there be an initial minimum stake amount?
         if (msg.value != commitment.stakeAmount) revert InsufficientMsgValue();
@@ -112,15 +110,13 @@ contract CommitmentStore is ICommitmentStore {
         delete withdrawals[stakerToSlash];
     }
 
-    function denyBonk(
-        address slasher
-    ) external payable {
+    function denyBonk(address slasher) external payable {
         Slash memory slash = bonks[slasher];
         if (slash.bond == 0) revert SlashDoesNotExist();
         if (block.timestamp >= slash.finalizationTimestamp) revert PassedLiveness();
 
         // TODO: At this point, create an OptimisticOracle assertion and send to DVM for resolution.
-        // Pull a bond from the msg.sender, and use the slasher's bond plus this dispute bond to payout the 
+        // Pull a bond from the msg.sender, and use the slasher's bond plus this dispute bond to payout the
         // winner of the dispute.
 
         // Delete bonk. If slasher wants to re-bonk, they must send a new bond.
