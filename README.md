@@ -9,6 +9,33 @@ This protocol is designed to be used by a service provider who wants to assert t
 
 This project also has been referred to as "The Stick" because it acts as a disincentive to certain behaviors, as opposed to "The Carrot" which acts as an incentive. [UMA's "KPI Options"](https://docs.uma.xyz/resources/glossary#kpi-options) are an example of a Carrot-esque project that incentives certain behavior. 
 
+## Use cases
+
+### MEV Relays
+
+MEV Relays are critical infrastructure connecting validators and builders but they are trusted. There are numerous [examples](https://github.com/flashbots/mev-boost/issues/142) of MEV relays [misbehaving](https://notes.ethereum.org/@yoav/BJeOQ8rI5#Aligning-incentives-to-prevent-missed-slots) and many [calls](https://collective.flashbots.net/t/block-scoring-for-mev-boost-relays/202) to make [relays](https://hackmd.io/@ralexstokes/SynPJN_pq) [more](https://hackmd.io/bTmbknkGRM6RdVCCIrRblg) [accountable](https://github.com/flashbots/mev-boost/issues/99).
+
+Bonk could be used by Relay providers to add more insurance to validators and builders who opt to use their service.
+
+### Social Network Behavior
+
+Twitter accounts with more followers are more valuable. A Twitter user could promise certain KPI's and stake into Bonk to generate a viral following or commit to arbitrary terms. For example, [Hart](https://twitter.com/hal2001) the CEO of UMA has promised internally that he is committed to growing UMA's following so he could let us BONK him if he doesn't tweet at least 5 times a week.
+
+## Smart Contract Sequence Diagram
+
+This is the simplest sequence for how an MEV Relay would use Bonk and how their stake could be slashed. The relevant providers are:
+- MEV Relay: The service provider who stakes 1 ETH to back their SLA
+- User: Uses and pays for the MEV Relay service and slashes them if they defy their SLA
+- UMA: Resolves Bonks
+
+```mermaid
+sequenceDiagram
+    MEV Relay->>Smart Contract: Stake 1 ETH
+    User->>Smart Contract: Bonk MEV Relay for 0.1 ETH
+    MEV Relay-->>Smart Contract: Challenge Bonk
+    UMA-)Smart Contract: Resolve Challenge
+```
+
 ## FAQ
 
 ### Who gets paid the slashed stake?
@@ -23,19 +50,7 @@ The terms of the agreement should stipulate how much stake is liable to be slash
 
 The Bonker, or anyone, can add an additional stake to challenge a Bonk attempt, and the challenge will be resolved by the UMA Oracle. The Oracle will use the terms of the agreement originally proposed by the staker to resolve the challenge. As in all UMA challenges, the winner of the challenge will be paid out from the loser's stake.
 
-## Use cases
-
-### MEV Relays
-
-MEV Relays are critical infrastructure connecting validators and builders but they are trusted. There are numerous [examples](https://github.com/flashbots/mev-boost/issues/142) of MEV relays [misbehaving](https://notes.ethereum.org/@yoav/BJeOQ8rI5#Aligning-incentives-to-prevent-missed-slots) and many [calls](https://collective.flashbots.net/t/block-scoring-for-mev-boost-relays/202) to make [relays](https://hackmd.io/@ralexstokes/SynPJN_pq) [more](https://hackmd.io/bTmbknkGRM6RdVCCIrRblg) [accountable](https://github.com/flashbots/mev-boost/issues/99).
-
-Bonk could be used by Relay providers to add more insurance to validators and builders who opt to use their service.
-
-### Social Network Behavior
-
-Twitter accounts with more followers are more valuable. A Twitter user could promise certain KPI's and stake into Bonk to generate a viral following or commit to arbitrary terms. For example, [Hart](https://twitter.com/hal2001) the CEO of UMA has promised internally that he is committed to growing UMA's following so he could let us BONK him if he doesn't tweet at least 5 times a week.
-
-### Miscellaneous ideas
+## Miscellaneous ideas
 
 Here are some other ideas suggested by ChatGPT:
 
