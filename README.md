@@ -1,3 +1,11 @@
+# Setting the scene: Commitment Devices and Cooperative Games
+
+[Commitment devices](https://hackmd.io/@sxysun/ccdwtf#Day-1-Blockchain-Commitment-Devices) are ways to incentivize towards or disincentivize away from behavior. Incentivizing towards some behavior is well-studied (see airdrops, liquidity mining, KPI options), otherwise known as THE CARROT. We present a device that can be used to disincentivize someone from breaking their commitments, otherwise known as THE STICK, otherwise known as BONK go to commitment violation jail. We need both the CARROT and the STICK to play [cooperative games](https://medium.com/@virgilgr/ethereum-is-game-changing-technology-literally-d67e01a01cf8).
+
+> A major value proposition of cryptoeconomic mechanisms is that users can trustlessly collaborate by making credible commitments of their actions.
+
+> Crypto-economic systems such as the Ethereum blockchain are commitment devices on which humans and algorithmic agents play real-world coordination games at large scale and high frequency. Importantly, the outcomes of these coordination games depend crucially on the design of the commitment device.
+
 # BONK
 
 "Bonk", also known as "The Stick" or "UMA SLA", is a smart contract enabling users to stake and commit to agreements, enabling _anyone else_ to retroactive slash them due to misconduct as stipulated in the agreement terms. The agreement is enforced by the [UMA Optimistic oracle](https://docs.uma.xyz/developers/optimistic-oracle-v3/data-asserter). This mechanism is analogous to an on-chain SLA (Service Layer Agreement) for any agreement that is publicly verifiable.
