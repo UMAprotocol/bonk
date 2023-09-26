@@ -1,6 +1,6 @@
 [profile.default]
 auto_detect_solc = false
-solc = "0.8.20"
+solc = "0.8.16"
 gas_reports = ["*"]
 optimizer = true
 optimizer_runs = 1_000_000
