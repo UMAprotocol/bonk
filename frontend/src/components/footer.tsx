@@ -9,9 +9,7 @@ export function Footer() {
       </nav>
       <nav>
         <header className="footer-title">Resources</header>
-        <a className="link link-hover">What is MEV?</a>
-        <a className="link link-hover">MEV Smoothing</a>
-        <a className="link link-hover">OO</a>
+        <a className="link link-hover">What is OO?</a>
       </nav>
       <nav>
         <header className="footer-title">Links</header>

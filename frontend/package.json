@@ -10,9 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@helia/json": "^1.0.2",
+    "@multiformats/sha3": "^3.0.0",
     "@rainbow-me/rainbowkit": "^1.0.11",
     "@tanstack/react-query": "^4.35.3",
+    "@tanstack/react-query-devtools": "^4.35.3",
     "clsx": "^2.0.0",
+    "helia": "^2.0.3",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",
     "react": "^18.2.0",

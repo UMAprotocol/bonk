@@ -1,19 +1,19 @@
 import { SLATable } from "./sla-table";
-
-const MOCKED_SLAS = [
-  {
-    name: "Ultra Sound Relayer",
-    description: "Commitment to be good relayer",
-    tags: ["ultrasound", "mev", "relayer"],
-    stakedAmount: 1,
-  },
-];
+import { useMyCommitmentsQuery } from "../hooks/useMyCommitments";
+import { formatRawSLAs } from "../lib/utils";
 
 export function MySLAs() {
+  const { data, isLoading } = useMyCommitmentsQuery();
+  const formattedData = formatRawSLAs(data || []);
+
   return (
     <div className="card bg-base-100">
       <div className="card-body">
-        <SLATable slaList={MOCKED_SLAS} />
+        {isLoading ? (
+          <span className="loading loading-lg"></span>
+        ) : (
+          <SLATable slaList={formattedData} isMySLA />
+        )}
       </div>
     </div>
   );
