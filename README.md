@@ -4,9 +4,10 @@
 
 This protocol is designed to be used by a service provider who wants to assert their reputation to their prospective users via economic stake. This gives users confidence that if their service provider defies the terms of their mutual agreement, then they can receive reparations. Essentially, this mechanism can be used by service providers to "put their money where their mouth is".
 
-This project was nicknamed "Bonk" because of this meme:
+![Screenshot 2023-09-26 at 10 23 21](https://github.com/UMAprotocol/bonk/assets/9457025/bfd25eb5-deb3-42b9-b59a-47102d9c9e4f)
 
-It also has been referred to as "The Stick" because it acts as a disincentive to certain behaviors, as opposed to "The Carrot" which acts as an incentive. [UMA's "KPI Options"](https://docs.uma.xyz/resources/glossary#kpi-options) are an example of a Carrot-esque project that incentives certain behavior. 
+
+This project also has been referred to as "The Stick" because it acts as a disincentive to certain behaviors, as opposed to "The Carrot" which acts as an incentive. [UMA's "KPI Options"](https://docs.uma.xyz/resources/glossary#kpi-options) are an example of a Carrot-esque project that incentives certain behavior. 
 
 ## FAQ
 
