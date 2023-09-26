@@ -5,6 +5,8 @@ import { ICommitmentStore } from "./ICommitmentStore.sol";
 import { IERC20 } from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import { SafeERC20 } from "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 
+import "@uma/core/contracts/optimistic-oracle-v3/interfaces/OptimisticOracleV3Interface.sol";
+
 // Features we would add in the future:
 // - Ability for staker to earn revenue in exchange for staking. This could be used for example by MEV relays
 //   who are willing to enter into an SLA promising to offer premier services (i.e. X% of slot share or always in
@@ -24,7 +26,7 @@ contract CommitmentStore is ICommitmentStore {
     IERC20 public immutable slashToken;
 
     // Contract address used to resolve bonks.
-    address public resolutionOracle;
+    OptimisticOracleV3Interface public resolutionOracle;
 
     // Mapping of staker unique identifiers to commitment information.
     mapping(bytes32 => Commitment) public commitments;
@@ -33,7 +35,7 @@ contract CommitmentStore is ICommitmentStore {
     // Mapping of staker unique identifiers to bonk attempts.
     mapping(bytes32 => Bonk) public bonks;
 
-    constructor(address _resolutionOracle, uint256 _slashBond, IERC20 _slashToken) {
+    constructor(OptimisticOracleV3Interface _resolutionOracle, uint256 _slashBond, IERC20 _slashToken) {
         resolutionOracle = _resolutionOracle;
         slashBond = _slashBond;
         slashToken = _slashToken;
@@ -133,9 +135,23 @@ contract CommitmentStore is ICommitmentStore {
         if (bonkAttempt.bonkAmount == 0) revert SlashDoesNotExist();
         if (block.timestamp >= bonkAttempt.finalizationTimestamp) revert PassedLiveness();
 
-        // TODO: At this point, create an OptimisticOracle assertion and send to DVM for resolution.
-        // Pull a bond from the msg.sender, and use the slasher's bond plus this dispute bond to payout the
-        // winner of the dispute.
+        bytes32 assertionId =
+        // Assert the truth that the bonk is invalid. the bonker is the asserter and the caller of denyBonk is the
+        // disputer. All bond logic and resolution thereof between the bonker and disputer is handled in the OO.
+         slashToken.approve(address(resolutionOracle), slashBond * 2);
+        bytes32 assertionId = resolutionOracle.assertTruth(
+            abi.encodePacked("Bonk claimed to be invalid: 0x", stakerId), // The claim the OO is asserting.
+            bonkAttempt.bonker, // Asserter is the original bonker.
+            address(0), // Callbacks disabled.
+            address(0), // escalation manager disabled.
+            challengePeriod, // Liveness period set to the same as this contracts challenge period.
+            address(slashToken), // bond currency is slashToken.
+            slashBonk, // bond amount is slashBond.
+            "ASSERT_TRUTH", // Default OOv3 identifier.
+            bytes(0) // No DomainSeparator.
+        );
+        // Dispute the assertion and set the disputer to msg.sender.
+        resolutionOracle.disputeAssertion(assertionId, msg.sender);
 
         // Delete bonk. If slasher wants to re-bonk, they must send a new bond.
         delete bonks[stakerId];
