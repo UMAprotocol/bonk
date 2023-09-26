@@ -40,16 +40,17 @@ sequenceDiagram
 
 ## Use cases
 Bonk can be used in any situation where you need a financial commitment device to hold people accountable to what they claim they will uphold. Some initial examples we like include:
+
 ### MEV Relays
 
 MEV Relays are critical infrastructure connecting block proposers (validators) and builders. In the current MEV landscape this is a trusted actor. It is currently an [active topic of research](https://github.com/flashbots/mev-boost/issues/142) of MEV relays more [accountable](https://github.com/flashbots/mev-boost/issues/99) through the introduction of [block scoring](https://collective.flashbots.net/t/block-scoring-for-mev-boost-relays/202) a relays behaviour. There are currently proposals on how to [monitor](https://hackmd.io/@ralexstokes/SynPJN_pq) this kind of behavior, as well as a path forward to [include this within MEV-boost](https://github.com/flashbots/mev-boost/issues/99) but as of present there is no known timeline for this to be added to the protocol.
 
-Bonk could be used by Relays to add economic insurance to validators and builders who opt to use their service. For example, a relay could put 50 ETH within an SLA and commit to not deviating against some known and publicly verifiable block scoring metric. For example a Relay could commit publically to upholding some of the following bid validation metrics:
+Bonk could be used by Relays to add economic insurance to validators and builders who opt to use their service. For example, a relay could put 50 ETH within an SLA and commit to not deviating against some known and publicly verifiable block scoring metric. A Relay could commit publically to upholding some of the following bid validation metrics:
 - Consensus Layer Faults are when a Bid does not follow Ethereum Consensus Layer Protocol (e.g.: timestamp, previous randao or parent hash do not follow previous block's values).
 - Data Validation Faults are when a Bid does not follow Ethereum data types (e.g.: BLS12-381 Public keys should be 96 bytes long).
 - Registration Faults are when either the gas limit or fee recipient do not match validator registrations.
 
-Or, a relay could create their own definition within the SLA that they want to uphold. The point is that you can define an arbitrary set of rules that you want to uphole and you are penalized if your found to violate those rules.
+Or, a relay could create their own definition within the SLA that they want to uphold. The point is that they can define an arbitrary set of rules that they promise to uphold and are penalized if they violate those rules.
 
 ### Social Network Behavior
 
