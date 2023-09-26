@@ -2,13 +2,13 @@ export const COMMITMENT_STORE_ABI = [
   {
     inputs: [
       {
-        internalType: "address",
+        internalType: "contract OptimisticOracleV3",
         name: "_resolutionOracle",
         type: "address",
       },
       {
         internalType: "uint256",
-        name: "_slashBond",
+        name: "_bonkBond",
         type: "uint256",
       },
       {
@@ -278,6 +278,19 @@ export const COMMITMENT_STORE_ABI = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "bonkBond",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "bytes32",
@@ -316,9 +329,9 @@ export const COMMITMENT_STORE_ABI = [
     name: "challengePeriod",
     outputs: [
       {
-        internalType: "uint256",
+        internalType: "uint64",
         name: "",
-        type: "uint256",
+        type: "uint64",
       },
     ],
     stateMutability: "view",
@@ -455,22 +468,9 @@ export const COMMITMENT_STORE_ABI = [
     name: "resolutionOracle",
     outputs: [
       {
-        internalType: "address",
+        internalType: "contract OptimisticOracleV3",
         name: "",
         type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "slashBond",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
       },
     ],
     stateMutability: "view",

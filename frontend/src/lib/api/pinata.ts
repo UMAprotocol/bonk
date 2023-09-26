@@ -20,7 +20,7 @@ export async function pinJSONToIPFS(json: unknown) {
 }
 
 export async function fetchFromIPFS(cid: string) {
-  return fetch(`https://gateway.pinata.cloud/ipfs/${cid}`).then((response) =>
+  return fetch(`https://bonk.infura-ipfs.io/ipfs/${cid}`).then((response) =>
     response.json()
   );
 }

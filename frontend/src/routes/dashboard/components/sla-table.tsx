@@ -1,6 +1,9 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import clsx from "clsx";
 import { formatUnits } from "viem";
+
+import { BonkModal } from "./bonk-modal";
+import { WithdrawModal } from "./withdraw-modal";
 
 export type SLA = {
   id: string;
@@ -13,6 +16,7 @@ export type SLA = {
     | "bonk-proposed"
     | "bonk-denied"
     | "bonked"
+    | "withdrawal-requested"
     | "withdrawn";
 };
 
@@ -23,6 +27,9 @@ export function SLATable({
   slaList: SLA[];
   isMySLA: boolean;
 }) {
+  const [slaToBonk, setSLAToBonk] = useState<SLA | undefined>();
+  const [slaToWithdraw, setSLAToWithdraw] = useState<SLA | undefined>();
+
   const openModal = useCallback((modalId: string) => {
     const modal = document.getElementById(modalId) as HTMLDialogElement;
     if (modal) {
@@ -49,13 +56,33 @@ export function SLATable({
             <SLARow
               key={sla.id}
               sla={sla}
-              onClickWithdraw={() => openModal("withdraw-modal")}
-              onClickSlash={() => openModal("slash-modal")}
+              onClickWithdraw={() => {
+                setSLAToWithdraw(sla);
+                setTimeout(() => openModal("withdraw-modal"), 100);
+              }}
+              onClickSlash={() => {
+                setSLAToBonk(sla);
+                setTimeout(() => openModal("bonk-modal"), 100);
+              }}
               isMySLA={isMySLA}
             />
           ))}
         </tbody>
       </table>
+      {slaToBonk && (
+        <BonkModal
+          modalId="bonk-modal"
+          sla={slaToBonk!}
+          onClose={() => setSLAToBonk(undefined)}
+        />
+      )}
+      {slaToWithdraw && (
+        <WithdrawModal
+          modalId="withdraw-modal"
+          sla={slaToWithdraw!}
+          onClose={() => setSLAToWithdraw(undefined)}
+        />
+      )}
     </div>
   );
 }
@@ -80,7 +107,7 @@ function SLARow({
       <td className="w-12">{sla.stakingTokenSymbol}</td>
       <td className="w-12">
         <div
-          className={clsx("badge", {
+          className={clsx("badge py-6", {
             "badge-success": sla.status === "committed",
             "badge-warning":
               sla.status === "bonk-proposed" || sla.status === "bonk-denied",
@@ -93,11 +120,29 @@ function SLARow({
       </td>
       <td>
         {isMySLA ? (
-          <button className="btn btn-ghost btn-xs" onClick={onClickWithdraw}>
+          <button
+            className="btn btn-secondary btn-xs"
+            onClick={onClickWithdraw}
+            disabled={
+              sla.status === "withdrawal-requested" ||
+              sla.status === "withdrawn" ||
+              sla.status === "bonk-proposed" ||
+              sla.status === "bonked"
+            }
+          >
             Withdraw
           </button>
         ) : (
-          <button className="btn btn-ghost btn-xs" onClick={onClickSlash}>
+          <button
+            className="btn btn-secondary btn-xs"
+            onClick={onClickSlash}
+            disabled={
+              sla.status === "bonk-proposed" ||
+              sla.status === "bonked" ||
+              sla.status === "withdrawal-requested" ||
+              sla.status === "withdrawn"
+            }
+          >
             Bonk
           </button>
         )}

@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 import { Layout } from "../../components/layout";
 
 import heroImgSrc from "../../assets/hero.png";
@@ -14,7 +16,9 @@ export default function Root() {
               used by a service provider to commit to some agreement with their
               clients, who can slash them retroactively for misbehavior.
             </p>
-            <button className="btn">Let's bonk</button>
+            <Link className="btn" to={"/dashboard"}>
+              Let's bonk
+            </Link>
           </div>
         </div>
       </div>

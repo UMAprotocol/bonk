@@ -65,7 +65,7 @@ export function useCreateSLAMutation(opts?: { onSuccess?: () => void }) {
         });
       }
 
-      const commitmentId = slaToCreate.title + "_" + Date.now();
+      const commitmentId = Date.now();
 
       if (token && address) {
         const { request } = await publicClient.simulateContract({
@@ -94,7 +94,9 @@ export function useCreateSLAMutation(opts?: { onSuccess?: () => void }) {
         refetchMyCommitments();
       }
     },
-    onSuccess: opts?.onSuccess,
+    onSuccess: () => {
+      opts?.onSuccess?.();
+    },
   });
 }
 
