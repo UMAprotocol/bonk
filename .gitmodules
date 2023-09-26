@@ -5,8 +5,8 @@ url = https://github.com/foundry-rs/forge-std
 path = contracts/lib/openzeppelin-contracts
 url = https://github.com/OpenZeppelin/openzeppelin-contracts
 [submodule "contracts/lib/protocol"]
-path = contracts/lib/protocol
-url = https://github.com/UMAprotocol/protocol
+	path = contracts/lib/protocol
+	url = https://github.com/UMAprotocol/protocol
 [submodule "lib/protocol"]
 	path = lib/protocol
 	url = https://github.com/UMAprotocol/protocol
