@@ -5,7 +5,7 @@ import { ICommitmentStore } from "./ICommitmentStore.sol";
 import { IERC20 } from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import { SafeERC20 } from "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 
-import "@uma/core/contracts/optimistic-oracle-v3/implementation/OptimisticOracleV3.sol";
+import {OptimisticOracleV3} from "@uma/core/contracts/optimistic-oracle-v3/implementation/OptimisticOracleV3.sol";
 
 // Features we would add in the future:
 // - Ability for staker to earn revenue in exchange for staking. This could be used for example by MEV relays
