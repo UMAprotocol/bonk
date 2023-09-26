@@ -9,7 +9,7 @@ export function formatRawSLAs(rawSLAs: any[]) {
           description: commitment?.terms.description || "",
           stakedAmount: commitment?.args.stakeAmount || 0,
           stakingTokenSymbol: "USDC",
-          status: "committed",
+          status: commitment?.status || "committed",
         } as const)
     ) || []
   );
