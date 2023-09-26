@@ -1,5 +1,5 @@
 import { configureChains } from "wagmi";
-import { mainnet, goerli } from "wagmi/chains";
+import { goerli } from "wagmi/chains";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import { publicProvider } from "wagmi/providers/public";
@@ -12,7 +12,7 @@ export const walletConnectProjectId: string = import.meta.env
 export const pinataJwt: string = import.meta.env.VITE_PINATA_JWT;
 
 export const { chains, publicClient } = configureChains(
-  [mainnet, goerli],
+  [goerli],
   [infuraProvider({ apiKey: infuraApiKey }), publicProvider()]
 );
 
