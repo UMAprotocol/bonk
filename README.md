@@ -1,40 +1,59 @@
 # BONK
 
-"Bonk", also known as "The Stick" or "UMA SLA", is a smart contract enabling users to stake and commit to agreements, enabling *anyone else* to retroactive slash them due to misconduct as stipulated in the agreement terms. The agreement is enforced by the [UMA Optimistic oracle](https://docs.uma.xyz/developers/optimistic-oracle-v3/data-asserter). This mechanism is analogous to an on-chain SLA (Service Layer Agreement) for any agreement that is publicly verifiable.
+"Bonk", also known as "The Stick" or "UMA SLA", is a smart contract enabling users to stake and commit to agreements, enabling _anyone else_ to retroactive slash them due to misconduct as stipulated in the agreement terms. The agreement is enforced by the [UMA Optimistic oracle](https://docs.uma.xyz/developers/optimistic-oracle-v3/data-asserter). This mechanism is analogous to an on-chain SLA (Service Layer Agreement) for any agreement that is publicly verifiable.
 
 This protocol is designed to be used by a service provider who wants to assert their reputation to their prospective users via economic stake. This gives users confidence that if their service provider defies the terms of their mutual agreement, then they can receive reparations. Essentially, this mechanism can be used by service providers to "put their money where their mouth is".
 
 ![Screenshot 2023-09-26 at 10 23 21](https://github.com/UMAprotocol/bonk/assets/9457025/bfd25eb5-deb3-42b9-b59a-47102d9c9e4f)
 
+This project also has been referred to as "The Stick" because it acts as a disincentive to certain behaviors, as opposed to "The Carrot" which acts as an incentive. [UMA's "KPI Options"](https://docs.uma.xyz/resources/glossary#kpi-options) are an example of a Carrot-esque project that incentives certain behavior.
 
-This project also has been referred to as "The Stick" because it acts as a disincentive to certain behaviors, as opposed to "The Carrot" which acts as an incentive. [UMA's "KPI Options"](https://docs.uma.xyz/resources/glossary#kpi-options) are an example of a Carrot-esque project that incentives certain behavior. 
+## Mechanism description
+- A user who wants to create an SLA calls `makeCommitment` function, defining the `Commitment` information pertaining to what they are committing to. This contains:
+   - the `stakeToken` - token to stake
+   - the `stakeAmount` - amount to stake 
+   - the `commitmentTermsIdentifier` which is used to define the terms of the commitment. This field can be arbitrarily complex, such as an IPFS hash with a fully fleshed out SLA document.
+- As long as the staker does not break the terms of the SLA nothing happens to them.
+- Once you've entered into an SLA you cant instantly withdraw from the position. You must wait at least `challengePeriod` time before you can access your funds.
+- If they break the terms of their SLA they can get `bonk`ed by someone.
+   - To call `bonk` the caller must pay the `bonkBond` to prevent malicious/spam bonks. This bond is returned at the conclusion of the bonking if it was done correctly.
+   - When bonked any pending withdraws are canceled.
+   - The caller of `bonk` must define which `slashRecipient` address should receive the `slashAmount`. This enables the bonking to be scaled depending on the side of the violation made against the SLA. The caller can also define an optional `details` field which is used to help verifiers verify the `bonk` claim.
+   - There is `challengePeriod` time allocated for someone to `denyBonk`, which acts as a _dispute_ against the `bonk`. When this happens the `bonk` is escalated to the UMA DVM to resolve the dispute. Note that the UMA DVM is only responsible for dealing with correct allocation of the `bonkBond`s as a result of the dispute.
+- After `challengePeriod` is passed, `finalizeBonk` can be called to settle the `bonk`ing and pay as defined in the `bonk` call.
+
+### Smart Contract Sequence Diagram
+
+This is the simplest sequence for how a Committed Staker would use Bonk and how their stake could be slashed. The relevant parties are:
+
+- Committed Staker: The service provider who stakes 1 ETH to back their SLA
+- User: Uses and pays for the Committed Staker service and slashes them if they defy their SLA. Their relationship and how payments happen are defined out of the Bonk system.
+- UMA: Resolves Bonk disputes.
+
+```mermaid
+sequenceDiagram
+    Committed Staker->>Smart Contract: Stake 1 ETH
+    User->>Smart Contract: Bonk Committed Staker for 0.1 ETH
+    Committed Staker-->>Smart Contract: Challenge Bonk
+    UMA-)Smart Contract: Resolve Challenge
+```
 
 ## Use cases
-
+Bonk can be used in any situation where you need a financial commitment device to hold people accountable to what they claim they will uphold. Some initial examples we like include:
 ### MEV Relays
 
-MEV Relays are critical infrastructure connecting validators and builders but they are trusted. There are numerous [examples](https://github.com/flashbots/mev-boost/issues/142) of MEV relays [misbehaving](https://notes.ethereum.org/@yoav/BJeOQ8rI5#Aligning-incentives-to-prevent-missed-slots) and many [calls](https://collective.flashbots.net/t/block-scoring-for-mev-boost-relays/202) to make [relays](https://hackmd.io/@ralexstokes/SynPJN_pq) [more](https://hackmd.io/bTmbknkGRM6RdVCCIrRblg) [accountable](https://github.com/flashbots/mev-boost/issues/99).
+MEV Relays are critical infrastructure connecting block proposers (validators) and builders. In the current MEV landscape this is a trusted actor. It is currently an [active topic of research](https://github.com/flashbots/mev-boost/issues/142) of MEV relays more [accountable](https://github.com/flashbots/mev-boost/issues/99) through the introduction of [block scoring](https://collective.flashbots.net/t/block-scoring-for-mev-boost-relays/202) a relays behaviour. There are currently proposals on how to [monitor](https://hackmd.io/@ralexstokes/SynPJN_pq) this kind of behavior, as well as a path forward to [include this within MEV-boost](https://github.com/flashbots/mev-boost/issues/99) but as of present there is no known timeline for this to be added to the protocol.
 
-Bonk could be used by Relay providers to add more insurance to validators and builders who opt to use their service.
+Bonk could be used by Relays to add economic insurance to validators and builders who opt to use their service. For example, a relay could put 50 ETH within an SLA and commit to not deviating against some known and publicly verifiable block scoring metric. For example a Relay could commit publically to upholding some of the following bid validation metrics:
+- Consensus Layer Faults are when a Bid does not follow Ethereum Consensus Layer Protocol (e.g.: timestamp, previous randao or parent hash do not follow previous block's values).
+- Data Validation Faults are when a Bid does not follow Ethereum data types (e.g.: BLS12-381 Public keys should be 96 bytes long).
+- Registration Faults are when either the gas limit or fee recipient do not match validator registrations.
+
+Or, a relay could create their own definition within the SLA that they want to uphold. The point is that you can define an arbitrary set of rules that you want to uphole and you are penalized if your found to violate those rules.
 
 ### Social Network Behavior
 
 Twitter accounts with more followers are more valuable. A Twitter user could promise certain KPI's and stake into Bonk to generate a viral following or commit to arbitrary terms. For example, [Hart](https://twitter.com/hal2001) the CEO of UMA has promised internally that he is committed to growing UMA's following so he could let us BONK him if he doesn't tweet at least 5 times a week.
-
-## Smart Contract Sequence Diagram
-
-This is the simplest sequence for how an MEV Relay would use Bonk and how their stake could be slashed. The relevant providers are:
-- MEV Relay: The service provider who stakes 1 ETH to back their SLA
-- User: Uses and pays for the MEV Relay service and slashes them if they defy their SLA
-- UMA: Resolves Bonks
-
-```mermaid
-sequenceDiagram
-    MEV Relay->>Smart Contract: Stake 1 ETH
-    User->>Smart Contract: Bonk MEV Relay for 0.1 ETH
-    MEV Relay-->>Smart Contract: Challenge Bonk
-    UMA-)Smart Contract: Resolve Challenge
-```
 
 ## FAQ
 

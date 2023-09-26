@@ -26,8 +26,8 @@ contract CommitmentStore is ICommitmentStore {
 
     // Constants that are hardcoded or set upon construction. In a future iteration of this contract these could be
     // modified post-construction.
-    uint64 public constant challengePeriod = 1 hours;
-    uint256 public immutable slashBond;
+    uint64 public constant challengePeriod = 1 days;
+    uint256 public immutable bonkBond;
     IERC20 public immutable slashToken;
 
     // Contract address used to resolve bonks.
@@ -40,9 +40,9 @@ contract CommitmentStore is ICommitmentStore {
     // Mapping of staker unique identifiers to bonk attempts.
     mapping(bytes32 => Bonk) public bonks;
 
-    constructor(OptimisticOracleV3 _resolutionOracle, uint256 _slashBond, IERC20 _slashToken) {
+    constructor(OptimisticOracleV3 _resolutionOracle, uint256 _bonkBond, IERC20 _slashToken) {
         resolutionOracle = _resolutionOracle;
-        slashBond = _slashBond;
+        bonkBond = _bonkBond;
         slashToken = _slashToken;
     }
 
@@ -112,8 +112,8 @@ contract CommitmentStore is ICommitmentStore {
      * information.
      */
     function bonk(bytes32 stakerId, address slashRecipient, bytes32 details, uint256 slashAmount) external payable {
-        // Slash bond amount must be equal to current slashBond parameter.
-        slashToken.safeTransferFrom(msg.sender, address(this), slashBond);
+        // Slash bond amount must be equal to current bonkBond parameter.
+        slashToken.safeTransferFrom(msg.sender, address(this), bonkBond);
 
         // Check if commitment exists.
         Commitment memory commitment = commitments[stakerId];
@@ -142,7 +142,7 @@ contract CommitmentStore is ICommitmentStore {
 
         // Assert the truth that the bonk is invalid. the bonker is the asserter and the caller of denyBonk is the
         // disputer. All bond logic and resolution thereof between the bonker and disputer is handled in the OO.
-        slashToken.approve(address(resolutionOracle), slashBond * 2);
+        slashToken.approve(address(resolutionOracle), bonkBond * 2);
         bytes32 assertionId = resolutionOracle.assertTruth(
             abi.encodePacked("Bonk claimed to be invalid: 0x", stakerId), // The claim the OO is asserting.
             bonkAttempt.bonker, // Asserter is the original bonker.
@@ -150,7 +150,7 @@ contract CommitmentStore is ICommitmentStore {
             address(0), // escalation manager disabled.
             challengePeriod, // Liveness period set to the same as this contracts challenge period.
             slashToken, // bond currency is slashToken.
-            slashBond, // bond amount is slashBond.
+            bonkBond, // bond amount is bonkBond.
             "ASSERT_TRUTH", // Default OOv3 identifier.
             bytes32(0) // No DomainSeparator.
         );
@@ -178,7 +178,7 @@ contract CommitmentStore is ICommitmentStore {
         }
 
         // Payout.
-        slashToken.safeTransfer(bonkAttempt.bonker, slashBond);
+        slashToken.safeTransfer(bonkAttempt.bonker, bonkBond);
         commitments[stakerId].stakeToken.safeTransfer(slashRecipient, amountToSlash);
 
         emit BonkSucceeded(stakerId, commitments[stakerId].staker, bonkAttempt.bonker);
