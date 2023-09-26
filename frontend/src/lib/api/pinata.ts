@@ -20,7 +20,12 @@ export async function pinJSONToIPFS(json: unknown) {
 }
 
 export async function fetchFromIPFS(cid: string) {
-  return fetch(`https://bonk.infura-ipfs.io/ipfs/${cid}`).then((response) =>
-    response.json()
-  );
+  return fetch(
+    `https://peach-worrying-marlin-261.mypinata.cloud/ipfs/${cid}?pinataGatewayToken=${config.pinata.token}`
+  )
+    .then((response) => response.json())
+    .catch((error) => {
+      console.error(error);
+      throw error;
+    });
 }

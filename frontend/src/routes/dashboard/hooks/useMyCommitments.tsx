@@ -26,7 +26,7 @@ export function useMyCommitmentsQuery() {
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "NewCommitment",
-          fromBlock: 9762022n,
+          fromBlock: 9763922n,
           args: {
             staker: address,
           },
@@ -35,7 +35,7 @@ export function useMyCommitmentsQuery() {
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "BonkAttempt",
-          fromBlock: 9762022n,
+          fromBlock: 9763922n,
           args: {
             staker: address,
           },
@@ -44,7 +44,7 @@ export function useMyCommitmentsQuery() {
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "BonkDenied",
-          fromBlock: 9762022n,
+          fromBlock: 9763922n,
           args: {
             staker: address,
           },
@@ -53,7 +53,7 @@ export function useMyCommitmentsQuery() {
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "BonkSucceeded",
-          fromBlock: 9762022n,
+          fromBlock: 9763922n,
           args: {
             staker: address,
           },
@@ -62,7 +62,7 @@ export function useMyCommitmentsQuery() {
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "RequestCommitmentWithdrawal",
-          fromBlock: 9762022n,
+          fromBlock: 9763922n,
           args: {
             staker: address,
           },
@@ -71,7 +71,7 @@ export function useMyCommitmentsQuery() {
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "FinalizedCommitmentWithdrawal",
-          fromBlock: 9762022n,
+          fromBlock: 9763922n,
           args: {
             staker: address,
           },
