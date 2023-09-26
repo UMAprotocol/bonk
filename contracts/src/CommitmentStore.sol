@@ -14,6 +14,11 @@ import { SafeERC20 } from "openzeppelin-contracts/contracts/token/ERC20/utils/Sa
 //   are slashed equally.
 // - Ability to add to or decrease stake without completely ending commitment.
 // - Ability to change parameters post-construction like slash currency and amount.
+
+// This contract stores a list of commitments that are economically secured by a stake. The stake is slashable
+// if the commitment terms are breached. This contract could be used by a trusted MEV boost relay to signal
+// that their relay end point is more trustworthy than others. Relays directly benefit from increased proposer/validator
+// flow so they are naturally incentivized to provide additional assurances to their customers.
 contract CommitmentStore is ICommitmentStore {
     using SafeERC20 for IERC20;
 
