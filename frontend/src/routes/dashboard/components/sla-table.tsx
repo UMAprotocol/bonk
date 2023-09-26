@@ -4,6 +4,9 @@ import { formatUnits } from "viem";
 
 import { BonkModal } from "./bonk-modal";
 import { WithdrawModal } from "./withdraw-modal";
+import { FinalizeWithdrawModal } from "./finalize-withdraw-modal";
+import { DenyBonkModal } from "./deny-bonk-modal";
+import { FinalizeBonkModal } from "./finalize-bonk-modal";
 
 export type SLA = {
   id: string;
@@ -11,6 +14,7 @@ export type SLA = {
   description: string;
   stakedAmount: number | bigint;
   stakingTokenSymbol: string;
+  finalizationTimestamp?: bigint;
   status:
     | "committed"
     | "bonk-proposed"
@@ -60,9 +64,21 @@ export function SLATable({
                 setSLAToWithdraw(sla);
                 setTimeout(() => openModal("withdraw-modal"), 100);
               }}
+              onClickFinalizeWithdraw={() => {
+                setSLAToWithdraw(sla);
+                setTimeout(() => openModal("finalize-withdraw-modal"), 100);
+              }}
               onClickSlash={() => {
                 setSLAToBonk(sla);
                 setTimeout(() => openModal("bonk-modal"), 100);
+              }}
+              onClickDenySlash={() => {
+                setSLAToBonk(sla);
+                setTimeout(() => openModal("deny-bonk-modal"), 100);
+              }}
+              onClickFinalizeSlash={() => {
+                setSLAToBonk(sla);
+                setTimeout(() => openModal("finalize-bonk-modal"), 100);
               }}
               isMySLA={isMySLA}
             />
@@ -76,9 +92,30 @@ export function SLATable({
           onClose={() => setSLAToBonk(undefined)}
         />
       )}
+      {slaToBonk && (
+        <DenyBonkModal
+          modalId="deny-bonk-modal"
+          sla={slaToBonk!}
+          onClose={() => setSLAToBonk(undefined)}
+        />
+      )}
+      {slaToBonk && (
+        <FinalizeBonkModal
+          modalId="finalize-bonk-modal"
+          sla={slaToBonk!}
+          onClose={() => setSLAToBonk(undefined)}
+        />
+      )}
       {slaToWithdraw && (
         <WithdrawModal
           modalId="withdraw-modal"
+          sla={slaToWithdraw!}
+          onClose={() => setSLAToWithdraw(undefined)}
+        />
+      )}
+      {slaToWithdraw && (
+        <FinalizeWithdrawModal
+          modalId="finalize-withdraw-modal"
           sla={slaToWithdraw!}
           onClose={() => setSLAToWithdraw(undefined)}
         />
@@ -91,12 +128,18 @@ function SLARow({
   sla,
   isMySLA,
   onClickWithdraw,
+  onClickFinalizeWithdraw,
   onClickSlash,
+  onClickDenySlash,
+  onClickFinalizeSlash,
 }: {
   sla: SLA;
   isMySLA: boolean;
   onClickWithdraw: () => void;
+  onClickFinalizeWithdraw: () => void;
   onClickSlash: () => void;
+  onClickDenySlash: () => void;
+  onClickFinalizeSlash: () => void;
 }) {
   return (
     <tr>
@@ -122,31 +165,81 @@ function SLARow({
         {isMySLA ? (
           <button
             className="btn btn-secondary btn-xs"
-            onClick={onClickWithdraw}
+            onClick={
+              getWithdrawalAction(sla) === "finalize-withdrawal"
+                ? onClickFinalizeWithdraw
+                : onClickWithdraw
+            }
             disabled={
-              sla.status === "withdrawal-requested" ||
-              sla.status === "withdrawn" ||
-              sla.status === "bonk-proposed" ||
-              sla.status === "bonked"
+              getWithdrawalAction(sla) === "finalize-withdrawal"
+                ? false
+                : sla.status === "bonk-proposed" ||
+                  sla.status === "bonked" ||
+                  sla.status === "withdrawal-requested" ||
+                  sla.status === "withdrawn"
             }
           >
-            Withdraw
+            {getWithdrawalAction(sla) === "finalize-withdrawal"
+              ? "Finalize withdrawal"
+              : "Request withdrawal"}
           </button>
         ) : (
           <button
             className="btn btn-secondary btn-xs"
-            onClick={onClickSlash}
+            onClick={
+              getBonkAction(sla) === "deny-bonk"
+                ? onClickDenySlash
+                : getBonkAction(sla) === "finalize-bonk"
+                ? onClickFinalizeSlash
+                : onClickSlash
+            }
             disabled={
-              sla.status === "bonk-proposed" ||
-              sla.status === "bonked" ||
-              sla.status === "withdrawal-requested" ||
-              sla.status === "withdrawn"
+              getBonkAction(sla) === "deny-bonk"
+                ? false
+                : getBonkAction(sla) === "finalize-bonk"
+                ? false
+                : sla.status === "bonked" ||
+                  sla.status === "withdrawal-requested" ||
+                  sla.status === "withdrawn"
             }
           >
-            Bonk
+            {getBonkAction(sla) === "deny-bonk"
+              ? "Deny bonk"
+              : getBonkAction(sla) === "finalize-bonk"
+              ? "Finalize bonk"
+              : "Bonk"}
           </button>
         )}
       </td>
     </tr>
   );
+}
+function getWithdrawalAction(sla: SLA) {
+  if (sla.status === "withdrawal-requested") {
+    if (
+      BigInt(sla.finalizationTimestamp || 0) <
+      BigInt(Math.floor(Date.now() / 1000))
+    ) {
+      return "finalize-withdrawal";
+    } else {
+      return "withdraw";
+    }
+  } else {
+    return "withdraw";
+  }
+}
+
+function getBonkAction(sla: SLA) {
+  if (sla.status === "bonk-proposed") {
+    if (
+      BigInt(sla.finalizationTimestamp || 0) >
+      BigInt(Math.floor(Date.now() / 1000))
+    ) {
+      return "deny-bonk";
+    } else {
+      return "finalize-bonk";
+    }
+  } else {
+    return "bonk";
+  }
 }

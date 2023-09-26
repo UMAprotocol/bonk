@@ -10,6 +10,7 @@ export function formatRawSLAs(rawSLAs: any[]) {
           stakedAmount: commitment?.args.stakeAmount || 0,
           stakingTokenSymbol: "USDC",
           status: commitment?.status || "committed",
+          finalizationTimestamp: commitment?.finalizationTimestamp || 0,
         } as const)
     ) || []
   );

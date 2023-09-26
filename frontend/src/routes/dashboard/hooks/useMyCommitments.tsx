@@ -111,9 +111,23 @@ export function useMyCommitmentsQuery() {
                 commitment.args.stakerId
             );
 
+            const finalizationTimestamp = bonkAttempt
+              ? (
+                  await publicClient.readContract({
+                    address: COMMITMENT_STORE_ADDRESS,
+                    abi: COMMITMENT_STORE_ABI,
+                    functionName: "bonks",
+                    args: [commitment.args.stakerId!],
+                  })
+                )[3]
+              : withdrawalRequest
+              ? withdrawalRequest.args.finalizationTimestamp
+              : undefined;
+
             return {
               ...commitment,
               terms,
+              finalizationTimestamp: finalizationTimestamp,
               status: bonkDeny
                 ? "bonk-denied"
                 : bonkSucceed
