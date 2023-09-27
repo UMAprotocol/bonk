@@ -4,6 +4,7 @@ pragma solidity >=0.8.16;
 import { ICommitmentStore } from "./ICommitmentStore.sol";
 import { IERC20 } from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import { SafeERC20 } from "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
+import { ReentrancyGuard } from "openzeppelin-contracts/contracts/security/ReentrancyGuard.sol";
 
 interface OptimisticOracleV3Interface {
     function assertTruth(
@@ -37,7 +38,7 @@ interface OptimisticOracleV3Interface {
 // if the commitment terms are breached. This contract could be used by a trusted MEV boost relay to signal
 // that their relay end point is more trustworthy than others. Relays directly benefit from increased proposer/validator
 // flow so they are naturally incentivized to provide additional assurances to their customers.
-contract CommitmentStore is ICommitmentStore {
+contract CommitmentStore is ICommitmentStore, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     // Constants that are hardcoded or set upon construction. In a future iteration of this contract these could be
@@ -64,7 +65,7 @@ contract CommitmentStore is ICommitmentStore {
 
     /// CREATE NEW COMMITMENT AND DEPOSIT STAKE
 
-    function makeCommitment(bytes32 stakerId, Commitment memory commitment) external {
+    function makeCommitment(bytes32 stakerId, Commitment memory commitment) external nonReentrant {
         if (commitment.stakeAmount == 0) revert ZeroStake();
         if (commitment.staker != msg.sender) revert NotStaker();
         // Should there be an initial minimum stake amount?
@@ -82,7 +83,7 @@ contract CommitmentStore is ICommitmentStore {
      * @dev Cannot request stake withdrawal while undergoing bonk. If staker is bonked during this withdrawal pending
      * period then they will need to re request a withdrawal.
      */
-    function requestWithdrawStake(bytes32 stakerId) external {
+    function requestWithdrawStake(bytes32 stakerId) external nonReentrant {
         // Check if commitment exists for msg.sender.
         Commitment memory commitment = commitments[stakerId];
         if (commitment.stakeAmount == 0) revert NoCommitment();
@@ -99,7 +100,7 @@ contract CommitmentStore is ICommitmentStore {
         emit RequestCommitmentWithdrawal(stakerId, msg.sender, withdrawal.finalizationTimestamp);
     }
 
-    function finalizeWithdrawStake(bytes32 stakerId) external {
+    function finalizeWithdrawStake(bytes32 stakerId) external nonReentrant {
         Withdrawal storage withdrawal = withdrawals[stakerId];
         if (block.timestamp < withdrawal.finalizationTimestamp) revert Pending();
 
@@ -127,7 +128,15 @@ contract CommitmentStore is ICommitmentStore {
      * that describes the error conditions triggered by the staker, or could be a merkle root containing
      * information.
      */
-    function bonk(bytes32 stakerId, address slashRecipient, bytes32 details, uint256 slashAmount) external {
+    function bonk(
+        bytes32 stakerId,
+        address slashRecipient,
+        bytes32 details,
+        uint256 slashAmount
+    )
+        external
+        nonReentrant
+    {
         // Slash bond amount must be equal to current bonkBond parameter.
         slashToken.safeTransferFrom(msg.sender, address(this), bonkBond);
 
@@ -151,7 +160,7 @@ contract CommitmentStore is ICommitmentStore {
         emit BonkAttempt(stakerId, commitment.staker, msg.sender, slashAmount, slashRecipient, details);
     }
 
-    function denyBonk(bytes32 stakerId) external {
+    function denyBonk(bytes32 stakerId) external nonReentrant {
         Bonk memory bonkAttempt = bonks[stakerId];
         if (bonkAttempt.bonkAmount == 0) revert SlashDoesNotExist();
         if (block.timestamp >= bonkAttempt.finalizationTimestamp) revert PassedLiveness();
@@ -178,7 +187,7 @@ contract CommitmentStore is ICommitmentStore {
         delete bonks[stakerId];
     }
 
-    function finalizeBonk(bytes32 stakerId) external {
+    function finalizeBonk(bytes32 stakerId) external nonReentrant {
         Bonk memory bonkAttempt = bonks[stakerId];
         if (block.timestamp < bonkAttempt.finalizationTimestamp) revert Pending();
 
