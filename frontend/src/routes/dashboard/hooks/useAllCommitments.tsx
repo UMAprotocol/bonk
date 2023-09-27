@@ -117,10 +117,10 @@ export function useAllCommitmentsQuery() {
                 ? "bonked"
                 : bonkAttempt
                 ? "bonk-proposed"
-                : withdrawalRequest
-                ? "withdrawal-requested"
                 : withdrawalFinalization
                 ? "withdrawn"
+                : withdrawalRequest
+                ? "withdrawal-requested"
                 : "committed",
             };
           } else {

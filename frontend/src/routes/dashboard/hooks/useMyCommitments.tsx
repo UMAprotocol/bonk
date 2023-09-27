@@ -139,10 +139,10 @@ export function useMyCommitmentsQuery() {
                 ? "bonked"
                 : bonkAttempt
                 ? "bonk-proposed"
-                : withdrawalRequest
-                ? "withdrawal-requested"
                 : withdrawalFinalization
                 ? "withdrawn"
+                : withdrawalRequest
+                ? "withdrawal-requested"
                 : "committed",
             };
           } else {
