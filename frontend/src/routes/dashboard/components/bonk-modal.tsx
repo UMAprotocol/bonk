@@ -163,6 +163,7 @@ export function BonkModal({
         {isSuccess && (
           <div className="alert alert-success mt-8">
             <span>Bonk successfully attempted!</span>
+            <img src="https://slack-imgs.com/?c=1&o1=ro&url=https%3A%2F%2Fmedia0.giphy.com%2Fmedia%2FRodyInaeK9W3EZNaoB%2Fgiphy.gif%3Fcid%3D6104955e9g4q41ubbvyshqdysgw3mtjtjrdm5svno3slt3g9%26ep%3Dv1_gifs_gifId%26rid%3Dgiphy.gif%26ct%3Dg" />
           </div>
         )}
         {isError && (
