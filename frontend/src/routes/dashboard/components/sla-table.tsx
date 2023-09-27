@@ -154,7 +154,7 @@ function SLARow({
   isConnected: boolean;
 }) {
   return (
-    <tr>
+    <tr className="hover">
       <td>
         <div
           className="tooltip tooltip-right before:max-w-xl"
