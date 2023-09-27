@@ -81,6 +81,7 @@ contract CommitmentStoreTest is Test {
         assertEq(_bonker, bonker);
 
         // Advance time and finalize bonk
+        vm.warp(block.timestamp + 1 days);
         store.finalizeBonk(stakerId);
         assertEq(stakeToken.balanceOf(address(bonker)), bonkBond + slashAmount);
         (,,uint256 _stakeAmount,) = store.commitments(stakerId);
@@ -114,3 +115,4 @@ contract CommitmentStoreTest is Test {
         assertEq(_bonker, address(0));
 
     }
+}
