@@ -30,7 +30,7 @@ contract CommitmentStoreTest is Test {
         stakeToken.mint(bonker, bonkBond);
         store = new CommitmentStore(oracle, bonkBond, IERC20(stakeToken));
         vm.prank(committer);
-        stakeToken.approve(address(store), startingBalance+bonkBond);
+        stakeToken.approve(address(store), startingBalance + bonkBond);
         vm.prank(bonker);
         stakeToken.approve(address(store), bonkBond);
     }
@@ -84,7 +84,7 @@ contract CommitmentStoreTest is Test {
         vm.warp(block.timestamp + 1 days);
         store.finalizeBonk(stakerId);
         assertEq(stakeToken.balanceOf(address(bonker)), bonkBond + slashAmount);
-        (,,uint256 _stakeAmount,) = store.commitments(stakerId);
+        (,, uint256 _stakeAmount,) = store.commitments(stakerId);
         assertEq(_stakeAmount, stakeAmount - slashAmount);
         (address _deletedBonker,,,) = store.bonks(stakerId);
         assertEq(_deletedBonker, address(0));
@@ -110,9 +110,7 @@ contract CommitmentStoreTest is Test {
 
         vm.prank(committer);
         store.denyBonk(stakerId);
-        // assertEq(stakeToken.balanceOf(address(store)), stakeAmount + bonkBond * 2);
         (address _bonker,,,) = store.bonks(stakerId);
         assertEq(_bonker, address(0));
-
     }
 }
