@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { formatUnits } from "viem";
 
 import { shortenHexStr, shortenStr } from "../../../lib/utils/string";
+import bonkSoundSrc from "../../../assets/bonk.mp3";
 
 import { BonkModal } from "./bonk-modal";
 import { WithdrawModal } from "./withdraw-modal";
@@ -220,13 +221,14 @@ function SLARow({
         ) : (
           <button
             className="btn btn-secondary btn-xs"
-            onClick={
+            onClick={() => {
+              new Audio(bonkSoundSrc).play();
               getBonkAction(sla) === "deny-bonk"
-                ? onClickDenySlash
+                ? onClickDenySlash()
                 : getBonkAction(sla) === "finalize-bonk"
-                ? onClickFinalizeSlash
-                : onClickSlash
-            }
+                ? onClickFinalizeSlash()
+                : onClickSlash();
+            }}
             disabled={
               getBonkAction(sla) === "deny-bonk"
                 ? false

@@ -4,6 +4,7 @@ import { useAccount } from "wagmi";
 import { formatUnits } from "viem";
 
 import { useModalHandlers } from "../../../hooks/useModalHandlers";
+import bonkSoundSrc from "../../../assets/bonk.mp3";
 
 import { useBonkMutation } from "../hooks/useBonkMutation";
 import { SLA } from "./sla-table";
@@ -52,6 +53,7 @@ export function BonkModal({
 
   const handleClickBonk = async () => {
     if (address) {
+      new Audio(bonkSoundSrc).play();
       await bonk({
         stakerId: sla.id,
         details: slashDetails || "0x",
