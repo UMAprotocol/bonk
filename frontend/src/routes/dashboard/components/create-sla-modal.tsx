@@ -9,9 +9,9 @@ import { useCreateSLAMutation } from "../hooks/useCreateSLAMutation";
 export function CreateSLAModal({ modalId }: { modalId: string }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [stakingAmount, setStakingAmount] = useState(0);
+  const [stakingAmount, setStakingAmount] = useState("");
   const [selectedStakingToken, setSelectedStakingToken] = useState("");
-  const [didSucceed, setDidSucceed] = useState(false);
+  const [isInitialOpen, setIsInitialOpen] = useState(true);
 
   const { closeModal } = useModalHandlers(modalId);
 
@@ -19,8 +19,7 @@ export function CreateSLAModal({ modalId }: { modalId: string }) {
     setTitle("");
     setDescription("");
     setSelectedStakingToken("");
-    setStakingAmount(0);
-    setDidSucceed(false);
+    setStakingAmount("");
   }, []);
 
   const {
@@ -36,13 +35,13 @@ export function CreateSLAModal({ modalId }: { modalId: string }) {
   });
 
   const handleClickCreate = async () => {
+    setIsInitialOpen(false);
     await createSLA({
       title,
       description,
-      stakingAmount,
+      stakingAmount: Number(stakingAmount || 0),
       selectedStakingToken,
     });
-    setDidSucceed(true);
   };
 
   const isFormValid =
@@ -54,6 +53,7 @@ export function CreateSLAModal({ modalId }: { modalId: string }) {
       className="modal"
       onClose={() => {
         resetInputs();
+        setIsInitialOpen(true);
       }}
     >
       <div className="modal-box">
@@ -111,7 +111,7 @@ export function CreateSLAModal({ modalId }: { modalId: string }) {
               placeholder="Staking amount"
               className="join-item input input-bordered w-full"
               value={stakingAmount}
-              onChange={(e) => setStakingAmount(Number(e.target.value))}
+              onChange={(e) => setStakingAmount(e.target.value)}
             />
             <select
               className="select select-bordered join-item bg-base-200"
@@ -151,12 +151,12 @@ export function CreateSLAModal({ modalId }: { modalId: string }) {
             </button>
           )}
         </div>
-        {didSucceed && isSuccess && (
+        {!isInitialOpen && isSuccess && (
           <div className="alert alert-success mt-8">
             <span>SLA created successfully!</span>
           </div>
         )}
-        {didSucceed && isError && (
+        {!isInitialOpen && isError && (
           <div className="alert alert-error mt-8">
             <FiAlertCircle />
             <span>{String(error)}</span>

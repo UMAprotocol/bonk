@@ -5,6 +5,7 @@ import { COMMITMENT_STORE_ADDRESS } from "../../../lib/constants/addresses";
 import { COMMITMENT_STORE_ABI } from "../../../lib/constants/abis";
 import { fetchFromIPFS } from "../../../lib/api/pinata";
 import { parseCIDV0Bytes32 } from "../../../lib/utils/ipfs";
+import { config } from "../../../config";
 
 export function useAllCommitmentsQuery() {
   const publicClient = usePublicClient();
@@ -24,37 +25,37 @@ export function useAllCommitmentsQuery() {
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "NewCommitment",
-          fromBlock: 9763922n,
+          fromBlock: config.web3.events.fromBlock,
         }),
         publicClient.getContractEvents({
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "BonkAttempt",
-          fromBlock: 9763922n,
+          fromBlock: config.web3.events.fromBlock,
         }),
         publicClient.getContractEvents({
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "BonkDenied",
-          fromBlock: 9763922n,
+          fromBlock: config.web3.events.fromBlock,
         }),
         publicClient.getContractEvents({
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "BonkSucceeded",
-          fromBlock: 9763922n,
+          fromBlock: config.web3.events.fromBlock,
         }),
         publicClient.getContractEvents({
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "RequestCommitmentWithdrawal",
-          fromBlock: 9763922n,
+          fromBlock: config.web3.events.fromBlock,
         }),
         publicClient.getContractEvents({
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "FinalizedCommitmentWithdrawal",
-          fromBlock: 9763922n,
+          fromBlock: config.web3.events.fromBlock,
         }),
       ]);
 
