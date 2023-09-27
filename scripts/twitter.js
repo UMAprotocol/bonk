@@ -27,11 +27,6 @@ export async function checkTweets(username, numberOfDays, minTweetsPerDay) {
 
   while (!tweets.done) {
     for await (const tweet of tweets) {
-      console.log({
-        id: tweet.id,
-        text: tweet.text,
-        created_at: tweet.created_at,
-      });
       fetchedTweets.push({
         id: tweet.id,
         text: tweet.text,
