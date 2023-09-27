@@ -5,7 +5,23 @@ import { ICommitmentStore } from "./ICommitmentStore.sol";
 import { IERC20 } from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import { SafeERC20 } from "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 
-import { OptimisticOracleV3 } from "@uma/core/contracts/optimistic-oracle-v3/implementation/OptimisticOracleV3.sol";
+interface OptimisticOracleV3Interface {
+    function assertTruth(
+        bytes memory claim,
+        address asserter,
+        address callbackRecipient,
+        address escalationManager,
+        uint64 liveness,
+        IERC20 currency,
+        uint256 bond,
+        bytes32 identifier,
+        bytes32 domainId
+    )
+        external
+        returns (bytes32);
+
+    function disputeAssertion(bytes32 assertionId, address disputer) external;
+}
 
 // Features we would add in the future:
 // - Ability for staker to earn revenue in exchange for staking. This could be used for example by MEV relays
@@ -31,7 +47,7 @@ contract CommitmentStore is ICommitmentStore {
     IERC20 public immutable slashToken;
 
     // Contract address used to resolve bonks.
-    OptimisticOracleV3 public resolutionOracle;
+    OptimisticOracleV3Interface public resolutionOracle;
 
     // Mapping of staker unique identifiers to commitment information.
     mapping(bytes32 => Commitment) public commitments;
@@ -40,7 +56,7 @@ contract CommitmentStore is ICommitmentStore {
     // Mapping of staker unique identifiers to bonk attempts.
     mapping(bytes32 => Bonk) public bonks;
 
-    constructor(OptimisticOracleV3 _resolutionOracle, uint256 _bonkBond, IERC20 _slashToken) {
+    constructor(OptimisticOracleV3Interface _resolutionOracle, uint256 _bonkBond, IERC20 _slashToken) {
         resolutionOracle = _resolutionOracle;
         bonkBond = _bonkBond;
         slashToken = _slashToken;
@@ -111,7 +127,7 @@ contract CommitmentStore is ICommitmentStore {
      * that describes the error conditions triggered by the staker, or could be a merkle root containing
      * information.
      */
-    function bonk(bytes32 stakerId, address slashRecipient, bytes32 details, uint256 slashAmount) external payable {
+    function bonk(bytes32 stakerId, address slashRecipient, bytes32 details, uint256 slashAmount) external {
         // Slash bond amount must be equal to current bonkBond parameter.
         slashToken.safeTransferFrom(msg.sender, address(this), bonkBond);
 
@@ -135,7 +151,7 @@ contract CommitmentStore is ICommitmentStore {
         emit BonkAttempt(stakerId, commitment.staker, msg.sender, slashAmount, slashRecipient, details);
     }
 
-    function denyBonk(bytes32 stakerId) external payable {
+    function denyBonk(bytes32 stakerId) external {
         Bonk memory bonkAttempt = bonks[stakerId];
         if (bonkAttempt.bonkAmount == 0) revert SlashDoesNotExist();
         if (block.timestamp >= bonkAttempt.finalizationTimestamp) revert PassedLiveness();
