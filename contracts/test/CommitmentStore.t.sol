@@ -30,7 +30,7 @@ contract CommitmentStoreTest is Test {
         stakeToken.mint(bonker, bonkBond);
         store = new CommitmentStore(oracle, bonkBond, IERC20(stakeToken));
         vm.prank(committer);
-        stakeToken.approve(address(store), startingBalance);
+        stakeToken.approve(address(store), startingBalance+bonkBond);
         vm.prank(bonker);
         stakeToken.approve(address(store), bonkBond);
     }
@@ -56,7 +56,7 @@ contract CommitmentStoreTest is Test {
         assertEq(_staker, committer);
     }
 
-    // Test that normal bonk can be made.
+    // Test that normal bonk can be made and pays out the bonk recipient.
     function test_bonk() public {
         vm.prank(committer);
         uint256 stakeAmount = 10e18;
@@ -74,9 +74,45 @@ contract CommitmentStoreTest is Test {
         uint256 slashAmount = stakeAmount / 2;
         vm.prank(bonker);
         store.bonk(stakerId, bonker, bytes32("YOU_LIED_TO_ME"), slashAmount);
+        assertEq(stakeToken.balanceOf(address(bonker)), 0);
         assertEq(stakeToken.balanceOf(address(store)), stakeAmount + bonkBond);
 
         (address _bonker,,,) = store.bonks(stakerId);
         assertEq(_bonker, bonker);
+
+        // Advance time and finalize bonk
+        vm.warp(block.timestamp + 1 days);
+        store.finalizeBonk(stakerId);
+        assertEq(stakeToken.balanceOf(address(bonker)), bonkBond + slashAmount);
+        (,,uint256 _stakeAmount,) = store.commitments(stakerId);
+        assertEq(_stakeAmount, stakeAmount - slashAmount);
+        (address _deletedBonker,,,) = store.bonks(stakerId);
+        assertEq(_deletedBonker, address(0));
+    }
+
+    function test_denyBonk() public {
+        vm.prank(committer);
+        uint256 stakeAmount = 10e18;
+        bytes32 stakerId = bytes32("MEV_RELAY_SLA");
+        store.makeCommitment(
+            stakerId,
+            ICommitmentStore.Commitment({
+                staker: committer,
+                stakeToken: IERC20(stakeToken),
+                stakeAmount: stakeAmount,
+                commitmentTermsIdentifier: bytes32("100_WAYS_TO_TRUST_ME")
+            })
+        );
+
+        uint256 slashAmount = stakeAmount / 2;
+        vm.prank(bonker);
+        store.bonk(stakerId, bonker, bytes32("YOU_LIED_TO_ME"), slashAmount);
+
+        vm.prank(committer);
+        store.denyBonk(stakerId);
+        // assertEq(stakeToken.balanceOf(address(store)), stakeAmount + bonkBond * 2);
+        (address _bonker,,,) = store.bonks(stakerId);
+        assertEq(_bonker, address(0));
+
     }
 }
