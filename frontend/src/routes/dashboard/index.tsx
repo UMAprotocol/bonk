@@ -15,8 +15,6 @@ export default function DashboardOverview() {
   const { isConnected } = useAccount();
   const openModal = useOpenModal();
 
-  console.log("reneder");
-
   return (
     <Layout>
       <div className="flex flex-row justify-between items-center">

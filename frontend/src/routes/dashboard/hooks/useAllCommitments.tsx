@@ -24,37 +24,37 @@ export function useAllCommitmentsQuery() {
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "NewCommitment",
-          fromBlock: 9762022n,
+          fromBlock: 9763922n,
         }),
         publicClient.getContractEvents({
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "BonkAttempt",
-          fromBlock: 9762022n,
+          fromBlock: 9763922n,
         }),
         publicClient.getContractEvents({
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "BonkDenied",
-          fromBlock: 9762022n,
+          fromBlock: 9763922n,
         }),
         publicClient.getContractEvents({
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "BonkSucceeded",
-          fromBlock: 9762022n,
+          fromBlock: 9763922n,
         }),
         publicClient.getContractEvents({
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "RequestCommitmentWithdrawal",
-          fromBlock: 9762022n,
+          fromBlock: 9763922n,
         }),
         publicClient.getContractEvents({
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "FinalizedCommitmentWithdrawal",
-          fromBlock: 9762022n,
+          fromBlock: 9763922n,
         }),
       ]);
 
@@ -93,9 +93,23 @@ export function useAllCommitmentsQuery() {
                 commitment.args.stakerId
             );
 
+            const finalizationTimestamp = bonkAttempt
+              ? (
+                  await publicClient.readContract({
+                    address: COMMITMENT_STORE_ADDRESS,
+                    abi: COMMITMENT_STORE_ABI,
+                    functionName: "bonks",
+                    args: [commitment.args.stakerId!],
+                  })
+                )[3]
+              : withdrawalRequest
+              ? withdrawalRequest.args.finalizationTimestamp
+              : undefined;
+
             return {
               ...commitment,
               terms,
+              finalizationTimestamp,
               status: bonkDeny
                 ? "bonk-denied"
                 : bonkSucceed

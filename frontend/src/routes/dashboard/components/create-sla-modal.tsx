@@ -11,6 +11,7 @@ export function CreateSLAModal({ modalId }: { modalId: string }) {
   const [description, setDescription] = useState("");
   const [stakingAmount, setStakingAmount] = useState(0);
   const [selectedStakingToken, setSelectedStakingToken] = useState("");
+  const [didSucceed, setDidSucceed] = useState(false);
 
   const { closeModal } = useModalHandlers(modalId);
 
@@ -19,6 +20,7 @@ export function CreateSLAModal({ modalId }: { modalId: string }) {
     setDescription("");
     setSelectedStakingToken("");
     setStakingAmount(0);
+    setDidSucceed(false);
   }, []);
 
   const {
@@ -40,6 +42,7 @@ export function CreateSLAModal({ modalId }: { modalId: string }) {
       stakingAmount,
       selectedStakingToken,
     });
+    setDidSucceed(true);
   };
 
   const isFormValid =
@@ -117,7 +120,6 @@ export function CreateSLAModal({ modalId }: { modalId: string }) {
                 setSelectedStakingToken(e.target.value);
               }}
               value={selectedStakingToken}
-              defaultValue={""}
             >
               <option disabled value={""}>
                 Select token
@@ -149,12 +151,12 @@ export function CreateSLAModal({ modalId }: { modalId: string }) {
             </button>
           )}
         </div>
-        {isSuccess && (
+        {didSucceed && isSuccess && (
           <div className="alert alert-success mt-8">
             <span>SLA created successfully!</span>
           </div>
         )}
-        {isError && (
+        {didSucceed && isError && (
           <div className="alert alert-error mt-8">
             <FiAlertCircle />
             <span>{String(error)}</span>

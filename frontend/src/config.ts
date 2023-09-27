@@ -10,6 +10,7 @@ export const infuraApiKey: string = import.meta.env.VITE_INFURA_API_KEY;
 export const walletConnectProjectId: string = import.meta.env
   .VITE_WALLET_CONNECT_PROJECT_ID;
 export const pinataJwt: string = import.meta.env.VITE_PINATA_JWT;
+export const pinataToken: string = import.meta.env.VITE_PINATA_TOKEN;
 
 export const { chains, publicClient } = configureChains(
   [goerli],
@@ -28,6 +29,7 @@ export const metaMaskConnector = new MetaMaskConnector({ chains });
 export const config = {
   pinata: {
     jwt: pinataJwt,
+    token: pinataToken,
   },
   infura: {
     apiKey: infuraApiKey,
@@ -38,5 +40,3 @@ export const config = {
     connectors,
   },
 };
-
-console.log(config);
