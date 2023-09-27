@@ -2,6 +2,8 @@ import { useCallback, useState } from "react";
 import clsx from "clsx";
 import { formatUnits } from "viem";
 
+import { shortenHexStr, shortenStr } from "../../../lib/utils/string";
+
 import { BonkModal } from "./bonk-modal";
 import { WithdrawModal } from "./withdraw-modal";
 import { FinalizeWithdrawModal } from "./finalize-withdraw-modal";
@@ -47,10 +49,11 @@ export function SLATable({
         <thead>
           <tr>
             <th>ID</th>
-            <th>Name</th>
+            <th>Title</th>
             <th>Description</th>
             <th>Stake amount</th>
             <th>Staking token</th>
+            <th>Fin. timestamp</th>
             <th>Status</th>
             <th></th>
           </tr>
@@ -143,17 +146,35 @@ function SLARow({
 }) {
   return (
     <tr>
-      <td className="w-8">{sla.id.slice(0, 7)}...</td>
-      <td className="w-40">{sla.name}</td>
-      <td className="w-80">{sla.description}</td>
+      <td>
+        <div
+          className="tooltip tooltip-right before:max-w-xl"
+          data-tip={sla.id}
+        >
+          {shortenHexStr(sla.id)}
+        </div>
+      </td>
+      <td>{sla.name}</td>
+      <td>
+        <div className=" text-left tooltip" data-tip={sla.description}>
+          {shortenStr(sla.description, 100)}
+        </div>
+      </td>
       <td className="w-20">{formatUnits(BigInt(sla.stakedAmount), 6)}</td>
       <td className="w-12">{sla.stakingTokenSymbol}</td>
+      <td className="w-12">
+        {sla.finalizationTimestamp
+          ? new Date(Number(sla.finalizationTimestamp) * 1000).toLocaleString()
+          : "-"}
+      </td>
       <td className="w-12">
         <div
           className={clsx("badge py-6", {
             "badge-success": sla.status === "committed",
             "badge-warning":
-              sla.status === "bonk-proposed" || sla.status === "bonk-denied",
+              sla.status === "bonk-proposed" ||
+              sla.status === "bonk-denied" ||
+              sla.status === "withdrawal-requested",
             "badge-error": sla.status === "bonked",
             "badge-info": sla.status === "withdrawn",
           })}
@@ -176,7 +197,8 @@ function SLARow({
                 : sla.status === "bonk-proposed" ||
                   sla.status === "bonked" ||
                   sla.status === "withdrawal-requested" ||
-                  sla.status === "withdrawn"
+                  sla.status === "withdrawn" ||
+                  sla.status === "bonk-denied"
             }
           >
             {getWithdrawalAction(sla) === "finalize-withdrawal"
@@ -200,7 +222,8 @@ function SLARow({
                 ? false
                 : sla.status === "bonked" ||
                   sla.status === "withdrawal-requested" ||
-                  sla.status === "withdrawn"
+                  sla.status === "withdrawn" ||
+                  sla.status === "bonk-denied"
             }
           >
             {getBonkAction(sla) === "deny-bonk"

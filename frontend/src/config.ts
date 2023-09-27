@@ -40,5 +40,3 @@ export const config = {
     connectors,
   },
 };
-
-console.log(config);
