@@ -90,10 +90,10 @@ contract CommitmentStore is ICommitmentStore {
         // Clean up and return stake.
         delete withdrawals[stakerId];
         Commitment memory commitment = commitments[stakerId];
-        delete commitments[stakerId];
 
         // Return stake to staker.
         commitment.stakeToken.safeTransfer(commitment.staker, commitment.stakeAmount);
+        delete commitments[stakerId];
 
         emit FinalizedCommitmentWithdrawal(stakerId, msg.sender);
     }
@@ -158,8 +158,8 @@ contract CommitmentStore is ICommitmentStore {
         resolutionOracle.disputeAssertion(assertionId, msg.sender);
 
         // Delete bonk. If slasher wants to re-bonk, they must send a new bond.
-        delete bonks[stakerId];
         emit BonkDenied(stakerId, commitments[stakerId].staker, bonks[stakerId].bonker, msg.sender);
+        delete bonks[stakerId];
     }
 
     function finalizeBonk(bytes32 stakerId) external {
@@ -173,12 +173,11 @@ contract CommitmentStore is ICommitmentStore {
         // Payout.
         slashToken.safeTransfer(bonkAttempt.bonker, bonkBond);
         commitments[stakerId].stakeToken.safeTransfer(slashRecipient, amountToSlash);
+        emit BonkSucceeded(stakerId, commitments[stakerId].staker, bonkAttempt.bonker);
 
         // Clean up.
         delete bonks[stakerId];
         commitments[stakerId].stakeAmount -= amountToSlash;
         if (commitments[stakerId].stakeAmount == 0) delete commitments[stakerId];
-
-        emit BonkSucceeded(stakerId, commitments[stakerId].staker, bonkAttempt.bonker);
     }
 }
