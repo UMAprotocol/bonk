@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { base58btc } from "multiformats/bases/base58";
 import { CID } from "multiformats/cid";
-import { toHex, parseUnits, maxUint256, bytesToHex } from "viem";
+import { toHex, parseUnits, maxUint256, bytesToHex, formatUnits } from "viem";
 import { useAccount, usePublicClient, erc20ABI, useWalletClient } from "wagmi";
 
 import { COMMITMENT_STORE_ABI } from "../../../lib/constants/abis";
@@ -27,10 +27,6 @@ export function useCreateSLAMutation(opts?: { onSuccess?: () => void }) {
       stakingAmount: number;
       selectedStakingToken: string;
     }) => {
-      const cidV0Bytes32 = await uploadTermsToIPFS({
-        title: slaToCreate.title,
-        description: slaToCreate.description,
-      });
       const token = TOKENS.find(
         (token) => token.symbol === slaToCreate.selectedStakingToken
       );
@@ -43,6 +39,30 @@ export function useCreateSLAMutation(opts?: { onSuccess?: () => void }) {
         String(slaToCreate.stakingAmount),
         token.decimals
       );
+
+      const tokenBalance = await publicClient.readContract({
+        abi: erc20ABI,
+        address: token.address as `0x${string}`,
+        functionName: "balanceOf",
+        args: [address],
+      });
+
+      if (parsedAmount > tokenBalance) {
+        throw new Error(
+          `Insufficient balance - You need ${formatUnits(
+            parsedAmount,
+            token.decimals
+          )} ${token.symbol}, but have ${formatUnits(
+            tokenBalance,
+            token.decimals
+          )} ${token.symbol}`
+        );
+      }
+
+      const cidV0Bytes32 = await uploadTermsToIPFS({
+        title: slaToCreate.title,
+        description: slaToCreate.description,
+      });
 
       const allowance = await publicClient.readContract({
         abi: erc20ABI,

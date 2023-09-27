@@ -29,9 +29,11 @@ export type SLA = {
 export function SLATable({
   slaList,
   isMySLA,
+  isConnected,
 }: {
   slaList: SLA[];
   isMySLA: boolean;
+  isConnected: boolean;
 }) {
   const [slaToBonk, setSLAToBonk] = useState<SLA | undefined>();
   const [slaToWithdraw, setSLAToWithdraw] = useState<SLA | undefined>();
@@ -42,6 +44,10 @@ export function SLATable({
       modal.showModal();
     }
   }, []);
+
+  if (!slaList.length) {
+    return <div>No SLAs to display...</div>;
+  }
 
   return (
     <div className="overflow-x-auto">
@@ -61,6 +67,7 @@ export function SLATable({
         <tbody>
           {slaList.map((sla) => (
             <SLARow
+              isConnected={isConnected}
               key={sla.id}
               sla={sla}
               onClickWithdraw={() => {
@@ -135,6 +142,7 @@ function SLARow({
   onClickSlash,
   onClickDenySlash,
   onClickFinalizeSlash,
+  isConnected,
 }: {
   sla: SLA;
   isMySLA: boolean;
@@ -143,6 +151,7 @@ function SLARow({
   onClickSlash: () => void;
   onClickDenySlash: () => void;
   onClickFinalizeSlash: () => void;
+  isConnected: boolean;
 }) {
   return (
     <tr>
@@ -150,6 +159,7 @@ function SLARow({
         <div
           className="tooltip tooltip-right before:max-w-xl"
           data-tip={sla.id}
+          onClick={() => navigator.clipboard.writeText(sla.id)}
         >
           {shortenHexStr(sla.id)}
         </div>
@@ -183,7 +193,9 @@ function SLARow({
         </div>
       </td>
       <td>
-        {isMySLA ? (
+        {!isConnected ? (
+          <div></div>
+        ) : isMySLA ? (
           <button
             className="btn btn-secondary btn-xs"
             onClick={

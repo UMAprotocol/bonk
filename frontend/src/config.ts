@@ -11,6 +11,9 @@ export const walletConnectProjectId: string = import.meta.env
   .VITE_WALLET_CONNECT_PROJECT_ID;
 export const pinataJwt: string = import.meta.env.VITE_PINATA_JWT;
 export const pinataToken: string = import.meta.env.VITE_PINATA_TOKEN;
+export const eventsFromBlock: bigint = BigInt(
+  import.meta.env.VITE_EVENTS_FROM_BLOCK || 9763922
+);
 
 export const { chains, publicClient } = configureChains(
   [goerli],
@@ -18,7 +21,7 @@ export const { chains, publicClient } = configureChains(
 );
 
 const { connectors } = getDefaultWallets({
-  appName: "Smooth Me Daddy",
+  appName: "BONK",
   projectId: walletConnectProjectId,
   chains,
 });
@@ -38,5 +41,10 @@ export const config = {
     chains,
     publicClient,
     connectors,
+  },
+  web3: {
+    events: {
+      fromBlock: eventsFromBlock,
+    },
   },
 };

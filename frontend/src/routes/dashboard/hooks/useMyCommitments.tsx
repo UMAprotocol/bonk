@@ -5,6 +5,7 @@ import { COMMITMENT_STORE_ADDRESS } from "../../../lib/constants/addresses";
 import { COMMITMENT_STORE_ABI } from "../../../lib/constants/abis";
 import { fetchFromIPFS } from "../../../lib/api/pinata";
 import { parseCIDV0Bytes32 } from "../../../lib/utils/ipfs";
+import { config } from "../../../config";
 
 export function useMyCommitmentsQuery() {
   const publicClient = usePublicClient();
@@ -14,6 +15,10 @@ export function useMyCommitmentsQuery() {
     enabled: !!address,
     queryKey: ["my-commitments", address],
     queryFn: async () => {
+      if (!address) {
+        return [];
+      }
+
       const [
         myCommitments,
         myBonkAttempts,
@@ -26,7 +31,7 @@ export function useMyCommitmentsQuery() {
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "NewCommitment",
-          fromBlock: 9763922n,
+          fromBlock: config.web3.events.fromBlock,
           args: {
             staker: address,
           },
@@ -35,7 +40,7 @@ export function useMyCommitmentsQuery() {
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "BonkAttempt",
-          fromBlock: 9763922n,
+          fromBlock: config.web3.events.fromBlock,
           args: {
             staker: address,
           },
@@ -44,7 +49,7 @@ export function useMyCommitmentsQuery() {
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "BonkDenied",
-          fromBlock: 9763922n,
+          fromBlock: config.web3.events.fromBlock,
           args: {
             staker: address,
           },
@@ -53,7 +58,7 @@ export function useMyCommitmentsQuery() {
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "BonkSucceeded",
-          fromBlock: 9763922n,
+          fromBlock: config.web3.events.fromBlock,
           args: {
             staker: address,
           },
@@ -62,7 +67,7 @@ export function useMyCommitmentsQuery() {
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "RequestCommitmentWithdrawal",
-          fromBlock: 9763922n,
+          fromBlock: config.web3.events.fromBlock,
           args: {
             staker: address,
           },
@@ -71,7 +76,7 @@ export function useMyCommitmentsQuery() {
           address: COMMITMENT_STORE_ADDRESS,
           abi: COMMITMENT_STORE_ABI,
           eventName: "FinalizedCommitmentWithdrawal",
-          fromBlock: 9763922n,
+          fromBlock: config.web3.events.fromBlock,
           args: {
             staker: address,
           },
@@ -134,10 +139,10 @@ export function useMyCommitmentsQuery() {
                 ? "bonked"
                 : bonkAttempt
                 ? "bonk-proposed"
-                : withdrawalRequest
-                ? "withdrawal-requested"
                 : withdrawalFinalization
                 ? "withdrawn"
+                : withdrawalRequest
+                ? "withdrawal-requested"
                 : "committed",
             };
           } else {

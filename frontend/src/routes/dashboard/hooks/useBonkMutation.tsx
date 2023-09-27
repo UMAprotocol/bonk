@@ -5,6 +5,7 @@ import { useAccount, usePublicClient, erc20ABI, useWalletClient } from "wagmi";
 
 import { COMMITMENT_STORE_ABI } from "../../../lib/constants/abis";
 import { COMMITMENT_STORE_ADDRESS } from "../../../lib/constants/addresses";
+import { TOKENS } from "../../../lib/constants/tokens";
 
 import { useAllCommitmentsQuery } from "./useAllCommitments";
 import { useMyCommitmentsQuery } from "./useMyCommitments";
@@ -26,7 +27,11 @@ export function useBonkMutation(opts?: { onSuccess?: () => void }) {
       stakingTokenSymbol: string;
       stakingTokenAmount: string;
     }) => {
-      if (!address || !address || !walletClient) {
+      const token = TOKENS.find(
+        (token) => token.symbol === slashArgs.stakingTokenSymbol
+      );
+
+      if (!address || !address || !walletClient || !token) {
         throw new Error("Address not found");
       }
 
@@ -66,7 +71,10 @@ export function useBonkMutation(opts?: { onSuccess?: () => void }) {
         });
       }
 
-      const parsedSlashAmount = parseUnits(String(slashArgs.slashAmount), 6);
+      const parsedSlashAmount = parseUnits(
+        String(slashArgs.slashAmount),
+        token.decimals
+      );
 
       if (address) {
         const { request } = await publicClient.simulateContract({
