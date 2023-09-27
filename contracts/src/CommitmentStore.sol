@@ -5,7 +5,7 @@ import { ICommitmentStore } from "./ICommitmentStore.sol";
 import { IERC20 } from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import { SafeERC20 } from "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 
-import {OptimisticOracleV3} from "@uma/core/contracts/optimistic-oracle-v3/implementation/OptimisticOracleV3.sol";
+import { OptimisticOracleV3 } from "@uma/core/contracts/optimistic-oracle-v3/implementation/OptimisticOracleV3.sol";
 
 // Features we would add in the future:
 // - Ability for staker to earn revenue in exchange for staking. This could be used for example by MEV relays
@@ -170,16 +170,14 @@ contract CommitmentStore is ICommitmentStore {
         uint256 amountToSlash = bonkAttempt.bonkAmount;
         address slashRecipient = bonkAttempt.bonkRewardRecipient;
 
-        // Clean up.
-        delete bonks[stakerId];
-        commitments[stakerId].stakeAmount -= amountToSlash;
-        if (commitments[stakerId].stakeAmount == 0) {
-            delete commitments[stakerId];
-        }
-
         // Payout.
         slashToken.safeTransfer(bonkAttempt.bonker, bonkBond);
         commitments[stakerId].stakeToken.safeTransfer(slashRecipient, amountToSlash);
+
+        // Clean up.
+        delete bonks[stakerId];
+        commitments[stakerId].stakeAmount -= amountToSlash;
+        if (commitments[stakerId].stakeAmount == 0) delete commitments[stakerId];
 
         emit BonkSucceeded(stakerId, commitments[stakerId].staker, bonkAttempt.bonker);
     }
